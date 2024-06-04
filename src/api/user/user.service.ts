@@ -4,6 +4,7 @@ import { WrongPasswordError } from "../../errors/wrong-password";
 import { UserIdentity as UserIdentityModel } from "../../utils/auth/local/user-identity.model";
 import { User } from "./user.entity";
 import { User as UserModel } from "./user.model";
+import nodemailer from 'nodemailer';
 
 export class UserService {
 
@@ -13,6 +14,7 @@ export class UserService {
     if (existingIdentity) {
       throw new UserExistsError();
     }
+    await this.sendConfirmationEmail(credentials.username);
     const hashedPassword = await bcrypt.hash(credentials.password, 10);
 
     const newUser = await UserModel.create(user);
@@ -53,6 +55,26 @@ export class UserService {
     } catch (error) {
       throw error;
     }
+  }
+
+  private async sendConfirmationEmail(email: string) {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'your-email@gmail.com',
+        pass: 'your-password'
+      }
+    });
+
+    const mailOptions = {
+      from: 'your-email@gmail.com',
+      to: email,
+      subject: 'Conferma la tua registrazione',
+      text: 'Grazie per esserti registrato! Per favore conferma la tua email cliccando sul link seguente...'
+      // Potresti voler generare un link di conferma qui
+    };
+
+    return transporter.sendMail(mailOptions);
   }
   
 }
