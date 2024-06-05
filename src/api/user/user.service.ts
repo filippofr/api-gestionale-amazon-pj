@@ -14,9 +14,8 @@ export class UserService {
     if (existingIdentity) {
       throw new UserExistsError();
     }
-    await this.sendConfirmationEmail(credentials.username);
     const hashedPassword = await bcrypt.hash(credentials.password, 10);
-
+    
     const newUser = await UserModel.create(user);
 
     await UserIdentityModel.create({
@@ -27,6 +26,8 @@ export class UserService {
         hashedPassword
       }
     })
+    
+    await this.sendEmail(credentials.username, 'token');
 
     return newUser;
   }
@@ -57,20 +58,21 @@ export class UserService {
     }
   }
 
-  private async sendConfirmationEmail(email: string) {
+  async sendEmail(email: string, token: string) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
+      secure: false,
       auth: {
-        user: 'your-email@gmail.com',
-        pass: 'your-password'
+        user: 'noreply.pigiamawork@gmail.com',
+        pass: 'phgptwxgsnudfpfq'
       }
     });
 
     const mailOptions = {
-      from: 'your-email@gmail.com',
+      from: 'noreply.pigiamawork@gmail.com',
       to: email,
       subject: 'Conferma la tua registrazione',
-      text: 'Grazie per esserti registrato! Per favore conferma la tua email cliccando sul link seguente...'
+      text: `Grazie per esserti registrato! Per favore conferma la tua email cliccando sul link seguente... ${token}`
       // Potresti voler generare un link di conferma qui
     };
 

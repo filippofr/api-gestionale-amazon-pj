@@ -2,15 +2,16 @@ import { NextFunction, Response } from "express";
 import * as jwt from 'jsonwebtoken';
 import { omit, pick } from 'lodash';
 import passport from "passport";
+import speakeasy from 'speakeasy';
 import { UserExistsError } from "../../errors/user-exists";
 import { WrongPasswordError } from "../../errors/wrong-password";
 import { TypedRequest } from "../../utils/typed-request.interface";
 import ipAddressService from "../ip-users/ip.service";
 import userService from '../user/user.service';
-import { AddUserDTO, LoginDTO, ResetPasswordDTO } from "./auth.dto";
-
+import { AddUserDTO, LoginDTO, PreLoginDTO, ResetPasswordDTO } from "./auth.dto";
 
 const JWT_SECRET = 'my_jwt_secret';
+const secret = speakeasy.generateSecret({ length: 20 });
 
 export const add = async (
   req: TypedRequest<AddUserDTO>,
@@ -20,13 +21,13 @@ export const add = async (
   try {
     const userData = omit(req.body, 'username', 'password', 'confPassword');
     const { password, confPassword } = req.body;
-    if(password !== confPassword){
+    if (password !== confPassword) {
       throw new WrongPasswordError();
     }
     const credentials = pick(req.body, 'username', 'password');
     const newUser = await userService.add(userData, credentials);
     res.send(newUser);
-    
+
   } catch (err) {
     if (err instanceof UserExistsError) {
       res.status(400);
@@ -35,6 +36,43 @@ export const add = async (
       next(err);
     }
   }
+}
+
+export const pre_login = async (
+  req: TypedRequest<PreLoginDTO>,
+  res: Response,
+  next: NextFunction
+) => {
+  passport.authenticate('local', async (err, user, info) => {
+    try {
+      if (err) {
+        return next(err);
+      }
+      console.log(user)
+      if (!user) {
+        res.status(401);
+        res.json({
+          error: 'LoginError',
+          message: info.message
+        });
+        return;
+      }
+      // TODO: associare il token allo user
+      const tempToken = speakeasy.totp({
+        secret: secret.base32,
+        encoding: 'base32'
+      });
+
+      await userService.sendEmail(req.body.username, tempToken);
+
+      res.status(200);
+      res.json({
+        user
+      });
+    } catch (err) {
+      next(err);
+    }
+  })(req, res, next);
 }
 
 export const login = async (
@@ -57,7 +95,24 @@ export const login = async (
       await ipAddressService.add(req.ip, "Login Rifiutato");
       return;
     }
-    const token = jwt.sign(user, JWT_SECRET, {expiresIn: '7 days'});
+    const tokenValidates = speakeasy.totp.verify({
+      secret: secret.base32,
+      encoding: 'base32',
+      token: req.body.token,
+      window: 6
+    });
+
+    if (!tokenValidates) {
+      res.status(401);
+      res.json({
+        error: 'LoginError',
+        message: 'Codice di verifica non valido'
+      });
+      await ipAddressService.add(req.ip, "Login Rifiutato");
+      return;
+    }
+
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: '7 days' });
     res.status(200);
     res.json({
       user,
@@ -112,5 +167,5 @@ export const resetPassword = async (
       next(err);
     }
   }
-    
+
 }

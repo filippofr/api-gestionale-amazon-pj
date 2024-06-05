@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Matches, MinLength } from "class-validator";
+import { IsEmail, IsNumber, IsString, Matches, MinLength } from "class-validator";
 
 export class AddUserDTO {
   @IsString()
@@ -25,12 +25,23 @@ export class AddUserDTO {
   confPassword: string;
 }
 
+export class PreLoginDTO {
+  @IsString()
+  username: string;
+
+  @IsString()
+  password: string;
+}
+
 export class LoginDTO {
   @IsString()
   username: string;
 
   @IsString()
   password: string;
+
+  @IsString()
+  token: string;
 }
 
 export class ResetPasswordDTO {
