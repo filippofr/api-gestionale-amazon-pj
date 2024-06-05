@@ -4,6 +4,8 @@ import { WrongPasswordError } from "../../errors/wrong-password";
 import { UserIdentity as UserIdentityModel } from "../../utils/auth/local/user-identity.model";
 import { User } from "./user.entity";
 import { User as UserModel } from "./user.model";
+import nodemailer from 'nodemailer';
+import {ObjectId} from "mongoose";
 
 export class UserService {
 
@@ -17,7 +19,7 @@ export class UserService {
 
     const newUser = await UserModel.create(user);
 
-    await UserIdentityModel.create({
+    const userIdentity = await UserIdentityModel.create({
       provider: 'local',
       user: newUser._id,
       credentials: {
@@ -25,6 +27,10 @@ export class UserService {
         hashedPassword
       }
     })
+    const confirmationLink = `http://localhost:3000/api/users/confirm-account/${userIdentity.id}`;
+    const mailSubject = 'Conferma la tua registrazione';
+    const mailText = 'Grazie per esserti registrato! Per favore conferma la tua email cliccando sul link seguente: '+ confirmationLink;
+    await this.sendEmail(credentials.username, mailSubject, mailText);
 
     return newUser;
   }
@@ -50,6 +56,54 @@ export class UserService {
       const updatedUser = await UserIdentityModel.findOne({user: userId});
 
       return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async sendEmail(email: string, mailSubject : string, mailText: string) {
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'noreply.pigiamawork@gmail.com',
+        pass: 'phgptwxgsnudfpfq'
+      }
+    });
+
+    const mailOptions = {
+      from: 'noreply.pigiamawork@gmail.com',
+      to: email,
+      subject: mailSubject,
+      text: mailText,
+      // Potresti voler generare un link di conferma qui
+    };
+
+    return transporter.sendMail(mailOptions);
+  }
+
+  async changeConfirmed(userId: string){
+    try {
+      const identity = await UserIdentityModel.findOne({_id: userId});
+
+      if (!identity) {
+        return 'Utente non trovato';
+      }
+
+      if(identity.confirmed == true){
+        return 'Account già confermato';
+      }
+      else {
+
+        identity.confirmed = true;
+        await identity.save();
+
+        const updatedUser = await UserIdentityModel.updateOne({user: userId});
+
+        return 'Account confermato con successo';
+      }
     } catch (error) {
       throw error;
     }

@@ -7,7 +7,8 @@ export const userIdentitySchema = new mongoose.Schema<iUserIdentity>({
   credentials: {type: {
     username: String,
     hashedPassword: String
-  }}
+  }},
+    confirmed: {type: Boolean, default: false}
 });
 
 userIdentitySchema.pre('findOne', function(next) {

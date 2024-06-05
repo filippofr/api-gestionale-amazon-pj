@@ -8,4 +8,5 @@ export interface UserIdentity {
         hashedPassword: string;
     };
     user: User;
+    confirmed: boolean;
 }
