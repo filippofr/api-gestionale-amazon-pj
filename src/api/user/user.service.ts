@@ -15,7 +15,7 @@ export class UserService {
       throw new UserExistsError();
     }
     const hashedPassword = await bcrypt.hash(credentials.password, 10);
-
+    
     const newUser = await UserModel.create(user);
 
     const userIdentity = await UserIdentityModel.create({
