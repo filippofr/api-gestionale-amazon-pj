@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { validate } from "../../utils/validation.middleware";
 import { isAuthenticated } from "../../utils/auth/authenticated.middleware";
-import { AddItemDTO, QueryItemDTO, ModifyItemDTO, DeleteItemDTO } from "./item.dto";
+import { AddItemDTO, QueryItemDTO, ModifyItemQueryDTO, ModifyItemDTO, DeleteItemDTO } from "./item.dto";
 import { add, remove, list, modify } from "./item.controller";
 //import { loginValidator } from "../../utils/login-checker";
 
@@ -27,7 +27,7 @@ router.patch(
     "/:id",
     //loginValidator("1"),
     validate(ModifyItemDTO, "body"),
-    validate(ModifyItemDTO, "params"),
+    validate(ModifyItemQueryDTO, "params"),
     modify
 );
 

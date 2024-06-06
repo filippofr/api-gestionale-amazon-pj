@@ -1,5 +1,5 @@
 import { Transform, Type } from "class-transformer";
-import { IsString, IsOptional, IsInt, IsMongoId } from "class-validator";
+import { IsString, IsOptional, IsInt, IsMongoId, isMongoId } from "class-validator";
 
 export class AddItemDTO {
     // tutto obbligatorio per l'aggiunta perché si può fare da frontend che son obbligatori
@@ -22,12 +22,17 @@ export class QueryItemDTO {
     // lasciamo vuoto questo DTO?
 }
 
-export class ModifyItemDTO {
-    // E' tutto opzionale perché magari non voglio modificare una certa roba
-    // tranne asin che non è modificabile
+export class ModifyItemQueryDTO{
     @IsMongoId()
     id: string;
+}
+
+export class ModifyItemDTO {
+    // E' tutto opzionale perché magari non voglio modificare una certa roba
     /*
+    @IsMongoId()
+    id: string;
+    
     @IsOptional()
     @IsString()
     asin: string;

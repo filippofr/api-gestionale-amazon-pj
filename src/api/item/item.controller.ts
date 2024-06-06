@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { TypedRequest } from "../../utils/typed-request.interface";
-import { AddItemDTO, QueryItemDTO, ModifyItemDTO, DeleteItemDTO } from "./item.dto";
+import { AddItemDTO, QueryItemDTO, ModifyItemQueryDTO, ModifyItemDTO, DeleteItemDTO } from "./item.dto";
 import itemService from "./item.service";
 import { Item } from "./item.entity";
 
@@ -36,7 +36,7 @@ export const add = async (
 }
 
 export const modify = async (
-    req: TypedRequest<ModifyItemDTO, any, ModifyItemDTO>,
+    req: TypedRequest<ModifyItemDTO, any, ModifyItemQueryDTO>,
     res: Response,
     next: NextFunction
 ) => {
