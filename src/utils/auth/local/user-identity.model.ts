@@ -8,7 +8,8 @@ export const userIdentitySchema = new mongoose.Schema<iUserIdentity>({
     username: String,
     hashedPassword: String
   }},
-    confirmed: {type: Boolean, default: false}
+    confirmed: {type: Boolean, default: false},
+    recoveryToken: {type: String}
 });
 
 userIdentitySchema.pre('findOne', function(next) {

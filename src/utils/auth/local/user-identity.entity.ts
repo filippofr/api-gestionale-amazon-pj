@@ -9,4 +9,5 @@ export interface UserIdentity {
     };
     user: User;
     confirmed: boolean;
+    recoveryToken: string;
 }

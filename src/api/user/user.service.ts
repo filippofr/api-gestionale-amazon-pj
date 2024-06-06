@@ -5,7 +5,6 @@ import { UserIdentity as UserIdentityModel } from "../../utils/auth/local/user-i
 import { User } from "./user.entity";
 import { User as UserModel } from "./user.model";
 import nodemailer from 'nodemailer';
-import {ObjectId} from "mongoose";
 
 export class UserService {
 
@@ -27,7 +26,7 @@ export class UserService {
         hashedPassword
       }
     })
-    const confirmationLink = `http://localhost:3000/api/users/confirm-account/${userIdentity.id}`;
+    const confirmationLink = `http://localhost:3000/api/confirm-account/${userIdentity.id}`;
     const mailSubject = 'Conferma la tua registrazione';
     const mailText = 'Grazie per esserti registrato! Per favore conferma la tua email cliccando sul link seguente: '+ confirmationLink;
     await this.sendEmail(credentials.username, mailSubject, mailText);
@@ -104,6 +103,54 @@ export class UserService {
 
         return 'Account confermato con successo';
       }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async recoveryPasswordEmail(email: string){
+
+    const identity = await UserIdentityModel.findOne({'credentials.username': email});
+
+if (!identity) {
+      return 'Utente non trovato';
+    }
+else{
+        const recoveryToken = Math.random().toString(36).substring(7);
+        identity.recoveryToken = recoveryToken;
+        await identity.save();
+
+        const mailSubject = 'Recupero password PigiamaWork';
+        const mailText = 'Il codice di recupero è: ' + recoveryToken;
+        await this.sendEmail(email, mailSubject, mailText);
+
+        return 'Email di recupero inviata con successo';
+        }
+  }
+
+
+  async recoveryPassword(email: string, newPassword: string, recoveryToken: string){
+    try {
+      const identity = await UserIdentityModel.findOne({'credentials.username': email});
+
+      if (!identity) {
+        return 'Utente non trovato';
+      }
+
+      if(identity.recoveryToken != recoveryToken){
+        return 'Codice di recupero non valido';
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      identity.credentials.hashedPassword = hashedPassword;
+      await identity.save();
+
+      const updatedUser = await UserIdentityModel.findOne({'credentials.username': email});
+
+      return updatedUser;
+
     } catch (error) {
       throw error;
     }

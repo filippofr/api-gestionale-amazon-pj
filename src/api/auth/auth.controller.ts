@@ -7,8 +7,7 @@ import { WrongPasswordError } from "../../errors/wrong-password";
 import { TypedRequest } from "../../utils/typed-request.interface";
 import ipAddressService from "../ip-users/ip.service";
 import userService from '../user/user.service';
-import { AddUserDTO, LoginDTO, ResetPasswordDTO } from "./auth.dto";
-
+import {AddUserDTO, LoginDTO, paramDTO, paramEmailDTO, RecoveryPasswordDTO, ResetPasswordDTO} from "./auth.dto";
 
 const JWT_SECRET = 'my_jwt_secret';
 
@@ -114,3 +113,53 @@ export const resetPassword = async (
   }
     
 }
+
+export const confirmAccount = async(
+    req: TypedRequest<any, any, paramDTO>,
+    res: Response,
+    next: NextFunction
+) => {
+  const id = req.params.id;
+  console.log(id);
+  const message = await userService.changeConfirmed(id);
+  res.json(message);
+}
+
+
+export const recoveryPasswordEmail = async(
+    req: TypedRequest<any, any, paramEmailDTO>,
+    res: Response,
+    next: NextFunction
+) => {
+  const email = req.params.email;
+  const message = await userService.recoveryPasswordEmail(email);
+  res.json(message);
+}
+
+export const recoveryPassword= async(
+    req: TypedRequest<RecoveryPasswordDTO>,
+    res: Response,
+    next: NextFunction
+) => {
+  try {
+    const email = req.body.username;
+    const {password, confPassword} = req.body;
+    const recoveryToken = req.body.recoveryToken;
+    if (password !== confPassword) {
+      throw new WrongPasswordError();
+    }
+    const message = await userService.recoveryPassword(email, password, recoveryToken);
+    res.json(message);
+  } catch (err) {
+    if (err instanceof WrongPasswordError) {
+      res.status(400);
+      res.json({
+        error: 'PasswordValidationError',
+        message: 'Password errata',
+      });
+    } else {
+      next(err);
+    }
+  }
+}
+
