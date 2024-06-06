@@ -6,7 +6,7 @@ import { Item } from "./item.entity";
 
 
 export const list = async (req: TypedRequest<any, QueryItemDTO, any>, res: Response, next: NextFunction) => {
-    const user = req.user!;
+    //const user = req.user!;
     const list = await itemService.list();
     res.json(list);
 }
@@ -43,7 +43,6 @@ export const modify = async (
     const id = req.params.id;
 
     const {
-        asin,
         title,
         giacenza,
         categoriaID
@@ -51,7 +50,6 @@ export const modify = async (
     try {
         const updated = await itemService.update(id,
             {
-                asin,
                 title,
                 giacenza,
                 categoriaID

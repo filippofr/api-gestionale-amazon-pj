@@ -7,10 +7,10 @@ import { add, remove, list, modify } from "./item.controller";
 //import { loginValidator } from "../../utils/login-checker";
 
 const router = Router();
-router.use(isAuthenticated);
+//router.use(isAuthenticated);
 
 // lista tutti item
-router.get('/', validate(QueryItemDTO, 'query'), list);        
+router.get('/',/* validate(QueryItemDTO),*/ list);        
 // aggiunge item
 router.post('', validate(AddItemDTO, 'body'), add);            
 

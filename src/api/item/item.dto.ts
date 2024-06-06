@@ -24,14 +24,14 @@ export class QueryItemDTO {
 
 export class ModifyItemDTO {
     // E' tutto opzionale perché magari non voglio modificare una certa roba
-    // tranne asin che è per riconoscere l'item da modificare
-    // e non è modificabile
+    // tranne asin che non è modificabile
     @IsMongoId()
     id: string;
-    
+    /*
+    @IsOptional()
     @IsString()
     asin: string;
-
+    */
     @IsOptional()
     @IsString()
     title?: string;
@@ -46,10 +46,6 @@ export class ModifyItemDTO {
 }
 
 export class DeleteItemDTO {
-    
     @IsMongoId()
     id: string;
-
-    @IsString()
-    asin: string;
 }

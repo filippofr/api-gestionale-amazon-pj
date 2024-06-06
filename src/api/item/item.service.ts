@@ -33,6 +33,15 @@ export class ItemService{
         if (!item) {
           throw new NotFoundError();
         }
+        if(!data.title){
+            data.title = item.title;
+        }
+        if(!data.giacenza){
+            data.giacenza = item.giacenza;
+        }
+        if(!data.categoriaID){
+            data.categoriaID = item.categoriaID;
+        }
         assign(item, data);
         await item.save();
         return ItemModel.findOne({ _id: id }) as Promise<Item>;
