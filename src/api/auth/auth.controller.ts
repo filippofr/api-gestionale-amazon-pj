@@ -205,7 +205,7 @@ export const recoveryPassword= async(
     if (password !== confPassword) {
       throw new WrongPasswordError();
     }
-    const message = await userService.recoveryPassword(email, password, recoveryToken);
+    const message = await userService.recoveryPassword(email, password, recoveryToken.toUpperCase());
     res.json(message);
   } catch (err) {
     if (err instanceof WrongPasswordError) {

@@ -117,11 +117,11 @@ if (!identity) {
     }
 else{
         const recoveryToken = Math.random().toString(36).substring(7);
-        identity.recoveryToken = recoveryToken;
+        identity.recoveryToken = recoveryToken.toUpperCase();
         await identity.save();
 
         const mailSubject = 'Recupero password PigiamaWork';
-        const mailText = 'Il codice di recupero è: ' + recoveryToken;
+        const mailText = 'Il codice di recupero è: ' + recoveryToken.toUpperCase();
         await this.sendEmail(email, mailSubject, mailText);
 
         return 'Email di recupero inviata con successo';
@@ -140,6 +140,10 @@ else{
       if(identity.recoveryToken != recoveryToken){
         return 'Codice di recupero non valido';
       }
+
+      const newRecoveryToken = Math.random().toString(36).substring(7);
+      identity.recoveryToken = newRecoveryToken.toUpperCase();
+      await identity.save();
 
       // Hash the new password
       const hashedPassword = await bcrypt.hash(newPassword, 10);
