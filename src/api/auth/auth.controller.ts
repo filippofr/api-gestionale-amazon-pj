@@ -63,7 +63,8 @@ export const pre_login = async (
         encoding: 'base32'
       });
 
-      await userService.sendEmail(req.body.username, tempToken);
+      const mailText = `Il tuo codice di autenticazione a 2 fattori è: ${tempToken}`;
+      await userService.sendEmail(req.body.username, "Codice auth a 2 fattori" , mailText);
 
       res.status(200);
       res.json({

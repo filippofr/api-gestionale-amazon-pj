@@ -60,7 +60,7 @@ export class UserService {
     }
   }
 
-  private async sendEmail(email: string, mailSubject : string, mailText: string) {
+  async sendEmail(email: string, mailSubject : string, mailText: string) {
 
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
