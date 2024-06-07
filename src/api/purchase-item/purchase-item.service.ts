@@ -1,6 +1,10 @@
 import {PurchaseItem} from "./purchase-item.model";
 import {ObjectId} from "mongoose";
 import {Item} from "../item/item.model";
+import {Item as iItem} from "../item/item.entity";
+import {Provider} from "../provider/provider.model";
+import {Purchase} from "../purchase/purchase.model";
+import {each} from "lodash";
 
 export class PurchaseItemService {
 
@@ -50,6 +54,33 @@ export class PurchaseItemService {
         }
         await PurchaseItem.findByIdAndDelete(id).populate('asin acquistoID');
         return item;
+    }
+
+
+    async purchaseItemAnalysis(startDate?: Date, endDate?: Date, providerId?: string, categoriaID?: number){
+        const query: any = {};
+        if(startDate && endDate){
+            const acquisto = await Purchase.find({dataFattura: {$gte: startDate, $lte: endDate}});
+            if (acquisto.length > 0) {
+                const acquistoIds = acquisto.map(acquisto => acquisto.id);
+                query['acquistoID'] = { $in: acquistoIds };
+            }
+        }
+        if(providerId){
+            const acquisto = await Purchase.find({fornitoreId: providerId});
+            if (acquisto.length > 0) {
+                const acquistoIds = acquisto.map(acquisto => acquisto.id);
+                query['acquistoID'] = { $in: acquistoIds };
+            }
+        }
+        if(categoriaID){
+            const items = await Item.find<iItem>({categoriaID});
+            if (items.length > 0) {
+                const itemIds = items.map(item => item.id);
+                query['asin'] = { $in: itemIds };
+            }
+        }
+        return await PurchaseItem.find(query).populate('asin acquistoID');
     }
 
 

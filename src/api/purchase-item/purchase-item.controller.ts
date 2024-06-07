@@ -1,6 +1,11 @@
 import {TypedRequest} from "../../utils/typed-request.interface";
 import {NextFunction, Response, Request} from "express";
-import {addPurchaseItemDTO, idPurchaseItemDTO, updatePurchaseItemDTO} from "./purchase-item.dto";
+import {
+    addPurchaseItemDTO,
+    analysisPurchaseItemDTO,
+    idPurchaseItemDTO,
+    updatePurchaseItemDTO
+} from "./purchase-item.dto";
 import PurchaseItemService from "./purchase-item.service";
 import {PurchaseItem} from "./purchase-item.model";
 import {PurchaseItemEntity} from "./purchase-item.entity";
@@ -104,3 +109,23 @@ export const deletePurchaseItem = async(
     }
 }
 
+
+export const purchaseItemAnalysis = async(
+    req: TypedRequest<analysisPurchaseItemDTO>,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        const startDate = req.body.startDate;
+        const endDate = req.body.endDate;
+        const providerId = req.body.providerId;
+        const categoriaId = req.body.categoriaId;
+
+        const result = await PurchaseItemService.purchaseItemAnalysis(startDate, endDate, providerId, categoriaId);
+
+        res.json(result);
+    }
+    catch(err){
+        next(err);
+    }
+}

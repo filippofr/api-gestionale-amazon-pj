@@ -4,10 +4,15 @@ import {
     deletePurchaseItem,
     getPurchaseItems,
     getPurchaseItemById,
-    updatePurchaseItem
+    updatePurchaseItem, purchaseItemAnalysis
 } from "./purchase-item.controller";
 import {validate} from "../../utils/validation.middleware";
-import {addPurchaseItemDTO, idPurchaseItemDTO, updatePurchaseItemDTO} from "./purchase-item.dto";
+import {
+    addPurchaseItemDTO,
+    analysisPurchaseItemDTO,
+    idPurchaseItemDTO,
+    updatePurchaseItemDTO
+} from "./purchase-item.dto";
 
 const router = Router();
 
@@ -17,6 +22,7 @@ router.post('/add', validate(addPurchaseItemDTO), addPurchaseItem);
 router.patch('/update', validate(updatePurchaseItemDTO), updatePurchaseItem);
 router.delete('/delete', validate(idPurchaseItemDTO), deletePurchaseItem);
 router.post('/getOne', validate(idPurchaseItemDTO), getPurchaseItemById);
+router.post('/analysis', validate(analysisPurchaseItemDTO), purchaseItemAnalysis);
 
 
 

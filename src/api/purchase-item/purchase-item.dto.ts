@@ -71,3 +71,26 @@ export class addPurchaseItemDTO{
     items: singlePurchaseItemDTO[];
 
 }
+
+
+export class analysisPurchaseItemDTO{
+
+    @IsDate()
+    @IsOptional()
+    @Type(()=>Date)
+    startDate: Date;
+
+    @IsDate()
+    @IsOptional()
+    @Type(()=>Date)
+    endDate: Date;
+
+    @IsString()
+    @IsOptional()
+    providerId: string;
+
+    @IsNumber()
+    @IsOptional()
+    categoriaId: number;
+
+}
