@@ -8,7 +8,7 @@ import { WrongPasswordError } from "../../errors/wrong-password";
 import { TypedRequest } from "../../utils/typed-request.interface";
 import ipAddressService from "../ip-users/ip.service";
 import userService from '../user/user.service';
-import { AddUserDTO, LoginDTO, PreLoginDTO, paramDTO, paramEmailDTO, RecoveryPasswordDTO, ResetPasswordDTO} from "./auth.dto";
+import { AddUserDTO, LoginDTO, paramDTO, paramEmailDTO, PreLoginDTO, RecoveryPasswordDTO, ResetPasswordDTO } from "./auth.dto";
 
 const JWT_SECRET = 'my_jwt_secret';
 const secret = speakeasy.generateSecret({ length: 20 });
@@ -19,11 +19,7 @@ export const add = async (
   next: NextFunction
 ) => {
   try {
-    const userData = omit(req.body, 'username', 'password', 'confPassword');
-    const { password, confPassword } = req.body;
-    if (password !== confPassword) {
-      throw new WrongPasswordError();
-    }
+    const userData = omit(req.body, 'username', 'password');
     const credentials = pick(req.body, 'username', 'password');
     const newUser = await userService.add(userData, credentials);
     res.send(newUser);
@@ -63,8 +59,8 @@ export const pre_login = async (
         encoding: 'base32'
       });
 
-      const mailText = `Il tuo codice di autenticazione a 2 fattori è: ${tempToken}`;
-      await userService.sendEmail(req.body.username, "Codice auth a 2 fattori" , mailText);
+      await userService.sendOtpToken(req.body.username, tempToken);
+      await userService.setOtpToken(req.body.username, tempToken);
 
       res.status(200);
       res.json({
@@ -96,12 +92,7 @@ export const login = async (
       await ipAddressService.add(req.ip, "Login Rifiutato");
       return;
     }
-    const tokenValidates = speakeasy.totp.verify({
-      secret: secret.base32,
-      encoding: 'base32',
-      token: req.body.token,
-      window: 6
-    });
+    const tokenValidates = await userService.verifyOtpToken(req.body.username, req.body.token);
 
     if (!tokenValidates) {
       res.status(401);
@@ -146,8 +137,7 @@ export const resetPassword = async (
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const modifiedUser = await userService.update(userId!, newPassword, oldPassword);
-
+    await userService.update(userId!, newPassword, oldPassword);
 
     res.status(200);
     res.json({
@@ -171,10 +161,10 @@ export const resetPassword = async (
 
 }
 
-export const confirmAccount = async(
-    req: TypedRequest<any, any, paramDTO>,
-    res: Response,
-    next: NextFunction
+export const confirmAccount = async (
+  req: TypedRequest<any, any, paramDTO>,
+  res: Response,
+  next: NextFunction
 ) => {
   const id = req.params.id;
   console.log(id);
@@ -183,24 +173,24 @@ export const confirmAccount = async(
 }
 
 
-export const recoveryPasswordEmail = async(
-    req: TypedRequest<any, any, paramEmailDTO>,
-    res: Response,
-    next: NextFunction
+export const recoveryPasswordEmail = async (
+  req: TypedRequest<any, any, paramEmailDTO>,
+  res: Response,
+  next: NextFunction
 ) => {
   const email = req.params.email;
   const message = await userService.recoveryPasswordEmail(email);
   res.json(message);
 }
 
-export const recoveryPassword= async(
-    req: TypedRequest<RecoveryPasswordDTO>,
-    res: Response,
-    next: NextFunction
+export const recoveryPassword = async (
+  req: TypedRequest<RecoveryPasswordDTO>,
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const email = req.body.username;
-    const {password, confPassword} = req.body;
+    const { password, confPassword } = req.body;
     const recoveryToken = req.body.recoveryToken;
     if (password !== confPassword) {
       throw new WrongPasswordError();
@@ -219,4 +209,3 @@ export const recoveryPassword= async(
     }
   }
 }
-

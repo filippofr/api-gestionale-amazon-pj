@@ -21,10 +21,10 @@ export class OrderService {
     return await OrderSchema.find();
   }
 
-  async fetchOrders(): Promise<Order[]> {
+  async fetchOrders() {
     const amazonOrders = await this.list();
     const orders = amazonOrders.payload.Orders;
-    const orderList: Order[] = [];
+    // const orderList: Order[] = [];
     
     for (const orderamz of orders) {
       const order: Order = {
@@ -32,12 +32,10 @@ export class OrderService {
         PurchaseDate: orderamz.PurchaseDate,
         MarketplaceId: orderamz.MarketplaceId
       }
-      const o = await this.add(order);
-      if (o)
-        orderList.push(o);
+      // const o = await this.add(order);
+      // if (o)
+      //   orderList.push(o);
     }
-
-    return orderList;
   }
 
 

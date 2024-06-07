@@ -8,4 +8,5 @@ export interface OrderItem {
     CurrencyCode: string;
     Amount: number;
   };
+  processed?: boolean;
 }

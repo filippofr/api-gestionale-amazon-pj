@@ -19,7 +19,7 @@ export const refreshOrders = async (
   try {
     const orders = await orderSrv.fetchOrders();
 
-    res.json(orders);
+    res.json({message: "Orders fetched successfully"});
   }
   catch (err) {
     next(err);

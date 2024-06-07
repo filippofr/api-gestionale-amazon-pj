@@ -17,8 +17,12 @@ export class ItemService{
     }
     
     // questo dovrebbe prendere un item specifico? non so
-    private async _getById(id: string) {
+    async getById(id: string) {
         return ItemModel.findOne({ _id: id });
+    }
+
+    async getByAsin(asin: string) {
+        return ItemModel.findOne({ asin: asin});
     }
 
     // questo dovrebbe prendere tutti gli item

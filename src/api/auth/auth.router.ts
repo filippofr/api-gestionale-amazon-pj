@@ -9,7 +9,7 @@ const router = Router();
 
 router.post('/register', validate(AddUserDTO, 'body'), add);
 router.post('/login', validate(LoginDTO), login);
-router.post('/pre-login', validate(PreLoginDTO), pre_login);
+router.post('/pre-login', validate(PreLoginDTO, 'body'), pre_login);
 router.post('/reset', isAuthenticated, validate(ResetPasswordDTO, 'body'), resetPassword);
 router.get('/confirm-account/:id', confirmAccount);
 router.get('/recovery-password/:email', recoveryPasswordEmail);

@@ -10,4 +10,6 @@ export interface UserIdentity {
     user: User;
     confirmed: boolean;
     recoveryToken: string;
+    otpToken: string;
+    otpTokenExpiration: Date;
 }

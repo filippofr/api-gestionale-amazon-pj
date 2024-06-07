@@ -11,6 +11,10 @@ export const orderItemSchema = new mongoose.Schema<OrderItem>({
       CurrencyCode: String,
       Amount: Number
     }
+  },
+  processed: {
+    type: Boolean,
+    default: false
   }
 });
 

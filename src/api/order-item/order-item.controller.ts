@@ -7,8 +7,8 @@ export const fetch = async (
   next: NextFunction
 ) => {
   try {
-    const itemsAdded = await orderItemSrv.fetchItems();
-    res.json(itemsAdded);
+    await orderItemSrv.fetchItems();
+    res.json({"message": "OrderItems fetched successfully"});
   }
   catch (err) {
     next(err);

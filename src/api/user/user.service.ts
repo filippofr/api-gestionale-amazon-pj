@@ -5,6 +5,8 @@ import { UserIdentity as UserIdentityModel } from "../../utils/auth/local/user-i
 import { User } from "./user.entity";
 import { User as UserModel } from "./user.model";
 import nodemailer from 'nodemailer';
+import userSrv from './user.service';
+import { NotFoundError } from '../../errors/not-found';
 
 export class UserService {
 
@@ -60,6 +62,37 @@ export class UserService {
     }
   }
 
+  async sendOtpToken(email: string, otpToken: string) {
+    const mailSubject = 'Codice di verifica';
+    const mailText = 'Il codice di verifica è: ' + otpToken;
+
+    await this.sendEmail(email, mailSubject, mailText);
+  }
+
+  async setOtpToken(username: string, otpToken: string) {
+    const identity = await UserIdentityModel.findOne({ 'credentials.username': username });
+    if (!identity) {
+      throw new NotFoundError();
+    }
+    identity.otpToken = otpToken;
+    identity.otpTokenExpiration = new Date();
+    await identity.save();
+  }
+
+  async verifyOtpToken(username: string, otpToken: string) {
+    const identity = await UserIdentityModel.findOne({ 'credentials.username': username });
+    if (!identity) {
+      throw new NotFoundError();
+    }
+    if (identity.otpToken !== otpToken) {
+      return false;
+    }
+    if ((Date.now() - identity.otpTokenExpiration.getTime()) > (2 * 60 * 1000)) {
+      return false;
+    }
+    return true;
+  }
+
   async sendEmail(email: string, mailSubject : string, mailText: string) {
 
     const transporter = nodemailer.createTransport({
@@ -76,8 +109,7 @@ export class UserService {
       from: 'noreply.pigiamawork@gmail.com',
       to: email,
       subject: mailSubject,
-      text: mailText,
-      // Potresti voler generare un link di conferma qui
+      text: mailText
     };
 
     return transporter.sendMail(mailOptions);
