@@ -80,7 +80,7 @@ export class PurchaseItemService {
                 query['asin'] = { $in: itemIds };
             }
         }
-        return await PurchaseItem.find(query).populate('asin acquistoID');
+        return PurchaseItem.find(query).populate('asin acquistoID');
     }
 
 
