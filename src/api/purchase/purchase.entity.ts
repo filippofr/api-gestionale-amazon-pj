@@ -6,4 +6,5 @@ export interface PurchaseEntity {
     fornitoreId: ProviderEntity | string | ObjectId,
     dataFattura: Date,
     numeroFattura: string
+    processed: boolean;
 }

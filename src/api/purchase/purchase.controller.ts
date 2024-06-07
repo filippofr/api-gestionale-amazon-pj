@@ -90,3 +90,20 @@ export const deletePurchase = async(
         next(err);
     }
 }
+
+export const processPurchase = async(
+    req: TypedRequest<purchaseIdDTO>,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        const purchaseId = req.body.id;
+
+        const result = await PurchaseService.processPurchase(purchaseId);
+
+        res.json(result);
+    }
+    catch(err){
+        next(err);
+    }
+}

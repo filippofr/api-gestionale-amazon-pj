@@ -116,16 +116,19 @@ export const purchaseItemAnalysis = async(
     next: NextFunction
 ) => {
     try{
+
         const startDate = req.body.startDate;
         const endDate = req.body.endDate;
         const providerId = req.body.providerId;
+        const itemId = req.body.itemId;
         const categoriaId = req.body.categoriaId;
 
-        const result = await PurchaseItemService.purchaseItemAnalysis(startDate, endDate, providerId, categoriaId);
-
+        const result = await PurchaseItemService.purchaseItemAnalysisAggregate(startDate, endDate, providerId, itemId, categoriaId);
+        console.log(result);
         res.json(result);
     }
     catch(err){
         next(err);
     }
 }
+

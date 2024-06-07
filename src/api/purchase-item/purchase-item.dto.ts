@@ -76,18 +76,20 @@ export class addPurchaseItemDTO{
 export class analysisPurchaseItemDTO{
 
     @IsDate()
-    @IsOptional()
     @Type(()=>Date)
     startDate: Date;
 
     @IsDate()
-    @IsOptional()
     @Type(()=>Date)
     endDate: Date;
 
     @IsString()
     @IsOptional()
     providerId: string;
+
+    @IsString()
+    @IsOptional()
+    itemId: string;
 
     @IsNumber()
     @IsOptional()

@@ -4,7 +4,8 @@ import {PurchaseEntity} from "./purchase.entity";
 export const purchaseSchema = new mongoose.Schema<PurchaseEntity>({
     fornitoreId: { type: mongoose.Schema.Types.ObjectId, ref: 'Provider' },
     dataFattura: Date,
-    numeroFattura: String
+    numeroFattura: String,
+    processed: { type: Boolean, default: false }
 });
 
 purchaseSchema.set('toJSON', {
