@@ -26,7 +26,7 @@ export class UserService {
         hashedPassword
       }
     })
-    const confirmationLink = `http://localhost:3000/api/confirm-account/${userIdentity.id}`;
+    const confirmationLink = `https://pigiamaworkapi.azurewebsites.net/api/confirm-account/${userIdentity.id}`;
     const mailSubject = 'Conferma la tua registrazione';
     const mailText = 'Grazie per esserti registrato! Per favore conferma la tua email cliccando sul link seguente: '+ confirmationLink;
     await this.sendEmail(credentials.username, mailSubject, mailText);
